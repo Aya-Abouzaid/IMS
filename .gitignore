@@ -1,0 +1,11 @@
+.env
+dev.env
+links.txt
+node_modules
+.vscode
+
+documents
+reports
+reportImages
+
+package copy.json
