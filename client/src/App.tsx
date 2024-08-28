@@ -6,13 +6,16 @@ import {
 } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './Login';
 
 // @ts-ignore
 function App() {
   return (
-    <div>
-      <p>setup works</p>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/Login" element={<Login />} />
+      </Routes>
+    </Router>
   );
 }
 

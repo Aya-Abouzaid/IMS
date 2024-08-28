@@ -1,0 +1,32 @@
+/* src/Breadcrumb.css */
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 16px; 
+    border-bottom: 1px solid #e8e8e8; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    z-index: 1000; 
+    border-style: none;
+      
+    
+  }
+  
+  .breadcrumb-item {
+    text-decoration: none;
+    color: #888; 
+  }
+  
+  .breadcrumb-item:hover {
+    text-decoration: underline;
+    color: #888;
+  }
+  
+  .separator {
+    margin: 0 8px;
+    color: #888;
+  }
+  
