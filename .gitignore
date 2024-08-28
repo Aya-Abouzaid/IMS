@@ -9,3 +9,5 @@ reports
 reportImages
 
 package copy.json
+node_modules
+
