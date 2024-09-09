@@ -6,9 +6,8 @@ import {
   UserOutlined, LockOutlined, CheckCircleOutlined, ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import Breadcrumb from './components/Breadcrumb';
-import './style/style.scss'; // Import the CSS file
-import favicon from '../public/favicon.png';
+import Breadcrumb from '../components/Breadcrumb';
+import '../style/style.scss';
 
 interface LoginFormValues {
   email: string;
@@ -38,7 +37,7 @@ function Login() {
   const handleOk = () => {
     setIsModalVisible(false);
     if (modalContent.title === 'Login Successful') {
-      navigate('/home'); // Navigate to the dashboard after successful login
+      navigate('/Users'); // Navigate to the user page after successful login
     }
   };
 
@@ -63,7 +62,6 @@ function Login() {
   };
 
   return (
-
     <div className="login-container">
       <Breadcrumb items={
         [{ title: 'Home', path: '/' },
@@ -76,9 +74,8 @@ function Login() {
           textAlign: 'center', margin: '10px 0', paddingTop: '10em',
         }}
       >
-        <img src={favicon} alt="CORELIA.ai Logo" style={{ maxWidth: '100px' }} />
-        {/* Adjust size as needed */}
-        <h1 className="login-heading">CORELIA.ai</h1>
+        <img src="/favicon.png" alt="CORELIA.ai Logo" style={{ maxWidth: '100px' }} />
+        <h1 className="login-heading">IMS </h1>
       </div>
       <Form
         name="login_form"
@@ -130,7 +127,7 @@ function Login() {
             {' '}
             {modalContent.title}
           </span>
-)}
+        )}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}

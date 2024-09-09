@@ -1,0 +1,43 @@
+/* Ensure the entire sidebar background is light */
+.custom-sidebar {
+    background-color: #ffffff !important; 
+    height: 100%; 
+  }
+  
+  
+  .custom-menu {
+    background-color: #ffffff !important; 
+    border: none; 
+  }
+  
+  
+  .ant-menu-item {
+    color: #000000;  
+    
+  }
+  
+  .ant-menu-item:hover {
+    background-color: #f0f0f0; 
+  }
+  
+  .ant-menu-item-selected {
+    background-color: #e6f7ff;  
+  }
+  
+   
+  .custom-sidebar .logo1-section {
+    background-color: #ffffff;  
+    padding: 16px 1px 0px ;  
+    text-align: center; 
+  }
+  
+  .custom-sidebar .logo2-section {
+    background-color: #ffffff; 
+    padding: 1px;
+    text-align: center;
+  }
+  
+  
+  .custom-sidebar .ant-layout-sider-children {
+    background-color: #ffffff;
+  }
