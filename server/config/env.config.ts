@@ -23,11 +23,13 @@ const env = {
   PEPPER: process.env.PEPPER as string,
   SALT: process.env.SALT,
 
+
   SUPER_ADMIN_USERNAME: process.env.SUPER_ADMIN_USERNAME,
   SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
   SUPER_ADMIN_ID: process.env.SUPER_ADMIN_ID,
   SENDER_EMAIL: process.env.SENDER_EMAIL as string,
   SENDER_PASSWORD: process.env.SENDER_PASSWORD as string,
 };
+
 
 export default env;

@@ -84,68 +84,119 @@ class UserController {
       }
     }
   };
-      //create User
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    const { user } = req.user;
+
+  createFirstAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    console.log("Creating the first admin user...");
+    
     try {
-      if (user.type === UserTypeEnum.ADMIN  || user.type === UserTypeEnum.SADMIN) { 
-        const newUser = this.generateUser(req.body, req.file?.filename);
-        console.log(`Creating user with picture: ${newUser.picture}`);
-        await this.userService.create({ ...newUser, createdBy: user.id});
-        return res.status(HttpStatus.OK).send({ message: 'User created successfully' });
+      const { firstName, email, password,payload ,mobile} = req.body; // Get data from request body
+  
+      // Validate that all required fields are provided
+      if (!firstName || !email || !password) {
+        return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Username, email, and password are required.' });
+      }
+  
+      const adminData = {
+        firstName,
+        email,
+        password,
+        type: UserTypeEnum.ADMIN, 
+        payload,
+        mobile,
+        // Use the appropriate enum value for admin
+        // Include other necessary fields if required, like orgId or clientId
+      };
+  
+      // Check if an admin already exists
+      const existingAdmin = await this.userService.getByEmail(adminData.email);
+      console.log('Existing admin:', existingAdmin);
+      if (existingAdmin) {
+        return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Admin user already exists' });
+      }
+  
+      // Create the new admin user
+      const hashedPassword = hashPassword(adminData.password); // Hash the password
+      await this.userService.create({ ...adminData, password: hashedPassword });
+      
+      return res.status(HttpStatus.CREATED).send({ message: 'First admin user created successfully' });
+    } catch (e: any) {
+      next(new HttpError(e.message || 'Failed to create the first admin user, please try again!', e.statusCode || 500));
+    }
+  };
+
+      // Create User
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    const { user } = req.user; // Current user (Admin or Team Leader)
+    try {
+      const newUser = this.generateUser(req.body, req.file?.filename);
+
+      if (user.type === UserTypeEnum.ADMIN || user.type === UserTypeEnum.SADMIN) {
+        // Admin creating a user
+        await this.userService.create({ ...newUser, adminId: user.id });
+        return res.status(HttpStatus.CREATED).send({ message: 'User created successfully' });
       }
 
       if (user.type === UserTypeEnum.TEAMLEADER) {
-        const newTrainee = this.generateUser(req.body, req.file?.filename);
-        await this.userService.create({ ...newTrainee, createdBy: user.id });
-        return res.status(HttpStatus.OK).send({ message: 'Trainee created successfully' });
+        // Team Leader creating a trainee
+        await this.userService.create({ ...newUser, teamLeaderId: user.id });
+        return res.status(HttpStatus.CREATED).send({ message: 'Trainee created successfully' });
       }
 
+      return res.status(HttpStatus.FORBIDDEN).send({ message: 'You do not have permission to create a user' });
     } catch (e: any) {
-      next(new HttpError(e.message || 'Fail to add new User, please try again!', e.statusCode || 500));
+      next(new HttpError(e.message || 'Failed to add new User, please try again!', e.statusCode || 500));
     }
   };
-  //Update Users
+
+  // Update User
   update = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const { user } = req.user;
+    const { id } = req.params; // User ID to update
+    const { user } = req.user; // Current user (Admin or Team Leader)
+
     try {
+      const existingUser = await this.userService.getById(id);
+      if (!existingUser) {
+        return res.status(HttpStatus.NOT_FOUND).send({ message: 'User not found' });
+      }
+
       if (user.type === UserTypeEnum.ADMIN || user.type === UserTypeEnum.SADMIN) {
         await this.userService.updateById(id, req.body);
         return res.status(HttpStatus.OK).send({ message: 'User updated successfully' });
       }
-      if (user.type === UserTypeEnum.TEAMLEADER) {
-        const trainee = await this.userService.getById(id);
-        if (trainee && trainee.createdBy === user.id) {
-          await this.userService.updateById(id, req.body);
-          return res.status(HttpStatus.OK).send({ message: 'Trainee updated successfully' });
-        }
-        
+
+      if (user.type === UserTypeEnum.TEAMLEADER && existingUser.teamLeaderId === user.id) {
+        await this.userService.updateById(id, req.body);
+        return res.status(HttpStatus.OK).send({ message: 'Trainee updated successfully' });
       }
-      
+
+      return res.status(HttpStatus.FORBIDDEN).send({ message: 'You do not have permission to update this user' });
     } catch (e: any) {
       next(new HttpError(e.message || 'Failed to update User, please try again!', e.statusCode || 500));
     }
   };
 
-  // Delete a user
+  // Delete User
   delete = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const { user } = req.user;
+    const { id } = req.params; // User ID to delete
+    const { user } = req.user; // Current user (Admin or Team Leader)
+
     try {
+      const existingUser = await this.userService.getById(id);
+      if (!existingUser) {
+        return res.status(HttpStatus.NOT_FOUND).send({ message: 'User not found' });
+      }
+
       if (user.type === UserTypeEnum.ADMIN || user.type === UserTypeEnum.SADMIN) {
         await this.userService.deleteById(id);
         return res.status(HttpStatus.OK).send({ message: 'User deleted successfully' });
       }
-      if (user.type === UserTypeEnum.TEAMLEADER) {
-        const trainee = await this.userService.getById(id);
-        if (trainee && trainee.createdBy === user.id) {
-          await this.userService.deleteById(id);
-          return res.status(HttpStatus.OK).send({ message: 'Trainee deleted successfully' });
-        }
-        throw new HttpError('Unauthorized', HttpStatus.UNAUTHORIZED);
+
+      if (user.type === UserTypeEnum.TEAMLEADER && existingUser.teamLeaderId === user.id) {
+        await this.userService.deleteById(id);
+        return res.status(HttpStatus.OK).send({ message: 'Trainee deleted successfully' });
       }
-      throw new HttpError('Unauthorized', HttpStatus.UNAUTHORIZED);
+
+      return res.status(HttpStatus.FORBIDDEN).send({ message: 'You do not have permission to delete this user' });
     } catch (e: any) {
       next(new HttpError(e.message || 'Failed to delete User, please try again!', e.statusCode || 500));
     }
@@ -210,7 +261,9 @@ class UserController {
           token,
         });
       }
+
       const user = await this.userService.getByEmail(email);
+      console.log('User from DB:', user); // Log the retrieved user
       if (user && isPasswordValid(user.password as string, password)) {
         const token = signUser({ id: user.payload });
         return res.status(HttpStatus.OK).send({
@@ -218,6 +271,8 @@ class UserController {
           token,
         });
       }
+      console.log('Provided Password:', password); // Log the provided password
+    console.log('Stored Hashed Password:', user?.password); // Log the stored hashed password
       throw new HttpError('Email and password not match, Please try again !!', HttpStatus.BAD_REQUEST);
     } catch (e: any) {
       next(new HttpError(e.message || 'Fail to login this Users, please try again!', e.statusCode || 500));

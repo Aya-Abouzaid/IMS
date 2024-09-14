@@ -136,8 +136,8 @@ class UseeData {
         payload: user?.payload,
       };
     }
-    throw new HttpError('There is no User with this info!, Please try again !!', HttpStatus.NOT_FOUND);
-  };
+    return null;
+    };
 
   /**
   Retrieves all User objects from the database

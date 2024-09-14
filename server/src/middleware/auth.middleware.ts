@@ -47,6 +47,7 @@ const isAuth = async (req: Request, res: Response, next: NextFunction) => {
       // req.user = user;
       next();
     } else {
+      
       throw new HttpError('Unauthorized user !!, Please Try to login first !!', HttpStatus.UNAUTHORIZED);
     }
   } catch {
@@ -96,6 +97,8 @@ export const hasValidRole = (
   } catch {
     next(new HttpError('You don not have permissions to access this area!', HttpStatus.FORBIDDEN));
   }
+  
 });
+
 
 export default isAuth;

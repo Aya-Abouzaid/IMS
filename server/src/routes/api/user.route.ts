@@ -9,6 +9,14 @@ import { UserTypeEnum } from '../../types';
 
 
 const router = express.Router();
+
+// Admin 
+
+router.post('/create-first-admin', (req, res, next) => {
+  console.log('Received a request to create the first admin user');
+  next();
+}, user.createFirstAdmin);
+ // No authentication required for this route
 //admin and teamleaders can add trainees
 router.route('/')
   .post(isAuth, hasValidRole([UserTypeEnum.ADMIN, UserTypeEnum.TEAMLEADER]), uploadImages('profiles').single('picture'), isUserValidForCreate, user.create)

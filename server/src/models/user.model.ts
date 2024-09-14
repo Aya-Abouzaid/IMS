@@ -50,7 +50,7 @@ export class User {
     resetToken!: string;
 
   @prop({ required: true, enum: UserTypeEnum })
-    type!: string;
+    type!: UserTypeEnum;
 
   @prop({ required: false })
     picture!: string;
